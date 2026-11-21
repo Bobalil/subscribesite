@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Главная · Подписки.Одно{% endblock %}
+{% block content %}
+
+{% if request.query_params.get('error') == 'funds' %}
+  <div class="alert error">Недостаточно средств на кошельке — пополните баланс и повторите.</div>
+{% elif request.query_params.get('error') == 'empty' %}
+  <div class="alert error">Выберите хотя бы одну подписку в разделе «Подписки».</div>
+{% elif request.query_params.get('error') == 'amount' %}
+  <div class="alert error">Введите корректную сумму пополнения.</div>
+{% elif request.query_params.get('error') == 'payment' %}
+  <div class="alert error">Платёж не найден или уже обработан.</div>
+{% endif %}
+
+<section class="hero">
+  <span class="eyebrow">Всё в одном месте</span>
+  <h1>Один кошелёк — все подписки</h1>
+  <p>Управляйте подписками и оплачивайте их одной транзакцией. Пополните кошелёк один раз — и забудьте о десятке отдельных списаний.</p>
+  <div class="actions">
+    <a href="/subscriptions" class="btn">Выбрать подписки</a>
+    <a href="#topup" class="btn ghost">Пополнить кошелёк</a>
+  </div>
+</section>
+
+<div class="spacer"></div>
+
+<section class="value-grid">
+  <div class="value">
+    <div class="num">1</div>
+    <h3>Один платёж</h3>
+    <p>Пополняйте кошелёк одной суммой и оплачивайте все подписки сразу.</p>
+  </div>
+  <div class="value">
+    <div class="num">2</div>
+    <h3>Полный контроль</h3>
+    <p>Видите, что и когда списывается. Отключайте ненужное в один клик.</p>
+  </div>
+  <div class="value">
+    <div class="num">3</div>
+    <h3>История и прозрачность</h3>
+    <p>Каждая операция зафиксирована: пополнения, списания, выплаты сервисам.</p>
+  </div>
+</section>
+
+<div class="spacer"></div>
+
+<div class="grid-2">
+  <div class="panel" id="topup">
+    <div class="panel-head">
+      <h2 class="panel-title">Баланс кошелька</h2>
+      <span class="pill ok">Активен</span>
+    </div>
+    <div class="balance-value">
+      {{ '%.2f'|format(wallet.balance / 100) }} <span class="cur">₽</span>
+    </div>
+    <p class="muted small">Пополните один раз — и оплачивайте любые подписки из баланса.</p>
+    <hr class="divider">
+    <form method="post" action="/wallet/topup" class="row">
+      <div class="field">
+        <label for="topup-amount">Сумма пополнения, ₽</label>
+        <input id="topup-amount" name="amount" type="number" min="1" step="1" value="1000" required>
+      </div>
+      <div class="field" style="flex:0 0 auto; min-width:0">
+        <button type="submit">Пополнить</button>
+      </div>
+    </form>
+    <p class="small muted" style="margin-top:10px">Демо-режим: платёж эмулируется. В продакшене — СБП и карты через ЮKassa.</p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">Быстрые действия</h2>
+    </div>
+    <div class="stack">
+      <a href="/subscriptions" class="btn block">Перейти к подпискам</a>
+      <a href="/subscriptions" class="btn ghost block">Оплатить всё одной транзакцией</a>
+      {% if user.is_admin %}<a href="/admin" class="btn ghost block">Открыть админку</a>{% endif %}
+    </div>
+    <hr class="divider">
+    <p class="small muted" style="margin:0">
+      <b style="color:var(--text)">Совет.</b> Держите на кошельке сумму на 1–2 месяца вперёд — тогда списания пройдут без задержек.
+    </p>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<section class="trust">
+  <div class="item"><span class="dot"></span><div><b>Прозрачные списания</b>Каждый платёж виден в истории.</div></div>
+  <div class="item"><span class="dot"></span><div><b>Контроль подписок</b>Отключайте лишнее в один клик.</div></div>
+  <div class="item"><span class="dot"></span><div><b>Один платёж</b>Вместо десятка отдельных списаний.</div></div>
+</section>
+
+<div class="spacer"></div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2 class="panel-title">История операций</h2>
+  </div>
+  {% if entries %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Дата</th><th>Тип</th><th>Сумма</th><th>Описание</th></tr>
+      </thead>
+      <tbody>
+        {% for e in entries %}
+        <tr>
+          <td class="muted small">{{ e.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+          <td><span class="pill">{{ e.entry_type.value }}</span></td>
+          <td class="{{ 'neg' if e.amount < 0 else 'pos' }}">{{ '%+.2f'|format(e.amount / 100) }} ₽</td>
+          <td>{{ e.description }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Пока пусто. Пополните кошелёк, чтобы начать.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

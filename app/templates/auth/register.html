@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Регистрация</h1>
+
+{% if error %}
+<div style="color:#b00;margin-bottom:12px">{{ error }}</div>
+{% endif %}
+
+<form method="post" action="/auth/register-form" style="max-width:420px;display:flex;flex-direction:column;gap:10px">
+  <label>Email
+    <input name="email" type="email" required value="{{ form.email if form else '' }}">
+  </label>
+
+  <label>Телефон
+    <input name="phone" type="tel" required placeholder="+7 (999) 123-45-67"
+           value="{{ form.phone if form else '' }}" data-phone-mask>
+  </label>
+
+  <label>Имя (необязательно)
+    <input name="first_name" type="text">
+  </label>
+
+  <label>Фамилия (необязательно)
+    <input name="last_name" type="text">
+  </label>
+
+  <label>Пароль
+    <input name="password" type="password" required minlength="8">
+  </label>
+
+  <label>Повторите пароль
+    <input name="password_confirm" type="password" required minlength="8">
+  </label>
+
+  <label style="display:flex;gap:8px;align-items:flex-start">
+    <input type="checkbox" name="accept_terms" value="1" required>
+    <span>Я принимаю <a href="/legal/terms" target="_blank">пользовательское соглашение</a>
+      и <a href="/legal/privacy" target="_blank">политику конфиденциальности</a></span>
+  </label>
+
+  <button type="submit">Зарегистрироваться</button>
+</form>
+
+<p>Уже есть аккаунт? <a href="/auth/login">Войти</a></p>
+
+<script src="/static/js/phone-mask.js"></script>
+<script src="/static/js/cookie-banner.js"></script>
+{% endblock %}

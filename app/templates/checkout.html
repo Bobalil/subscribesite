@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Оплата · Подписки.Одно{% endblock %}
+{% block content %}
+<div class="max-560">
+  <div class="panel center">
+    <span class="eyebrow">Оплата</span>
+    <h2 style="margin:14px 0 8px; font-size:22px; letter-spacing:-.02em">Подтверждение оплаты</h2>
+    <p class="muted">Это демо-страница вместо реального провайдера (СБП / карта). В продакшене здесь будет QR СБП или форма ЮKassa.</p>
+    <hr class="divider">
+    <form method="post" action="/checkout/{{ pid }}/confirm">
+      <button type="submit" class="block">Подтвердить оплату</button>
+    </form>
+    <div class="spacer"></div>
+    <a href="/" class="muted small">← Вернуться на главную</a>
+  </div>
+</div>
+{% endblock %}

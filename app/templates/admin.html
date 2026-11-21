@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Админка · Подписки.Одно{% endblock %}
+{% block content %}
+
+<section class="hero" style="padding:28px 32px">
+  <span class="eyebrow">Админка</span>
+  <h1 style="font-size:28px; margin:12px 0 8px">Управление сервисом</h1>
+  <p style="margin-bottom:0">
+    Пользователи: <b>{{ users|length }}</b> · Сервисы: <b>{{ services|length }}</b> · Выплаты: <b>{{ payouts|length }}</b>
+  </p>
+</section>
+
+<div class="spacer"></div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2 class="panel-title">Списания по расписанию</h2>
+  </div>
+  <form method="post" action="/admin/run-charges">
+    <button type="submit">Запустить списания</button>
+  </form>
+  <p class="small muted" style="margin-top:12px">В продакшене запускается по cron/APScheduler. Здесь — ручной триггер для проверки.</p>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2 class="panel-title">Последние выплаты сервисам</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>User</th><th>Service</th><th>Сумма</th><th>Режим</th><th>Статус</th></tr></thead>
+      <tbody>
+        {% for p in payouts %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.user_id }}</td>
+          <td>{{ p.service_id }}</td>
+          <td>{{ '%.2f'|format(p.amount / 100) }} ₽</td>
+          <td><span class="pill">{{ p.mode.value }}</span></td>
+          <td><span class="pill {{ 'ok' if p.status.value == 'succeeded' else 'warn' if p.status.value == 'pending' else 'bad' }}">{{ p.status.value }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2 class="panel-title">Ledger</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>User</th><th>Тип</th><th>Сумма</th><th>Описание</th></tr></thead>
+      <tbody>
+        {% for e in ledger %}
+        <tr>
+          <td>{{ e.id }}</td>
+          <td>{{ e.user_id }}</td>
+          <td><span class="pill">{{ e.entry_type.value }}</span></td>
+          <td class="{{ 'neg' if e.amount < 0 else 'pos' }}">{{ '%+.2f'|format(e.amount / 100) }} ₽</td>
+          <td>{{ e.description }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
